@@ -1,0 +1,223 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace LongNumber
+{
+    class LongNumber
+    {
+        private int[] number = new int[100];
+        int length;
+        bool ifnegative = false; //начальное значение false т.е. число положительное
+        public LongNumber(string input)
+        {
+            length = input.Length;
+            if (input.Length != 0) //входное значение не равно 0
+            {
+                if (input[0] == '-') //проверка знака
+                {
+                    this.ifnegative = true; //замена с неотрицательное на отрицательное
+                    this.length--;
+                }
+                if (input[0] != '-')
+                {
+                    for (int i = 0; i < this.length; i++)
+                    {
+                        this.number[i] = Convert.ToInt32(input[this.length - 1 - i].ToString()); //переводит в строку (-1 потому что стр 22)
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < this.length; i++)
+                    {
+                        this.number[i] = Convert.ToInt32(input[this.length - i].ToString()); //переводит в строку
+                    }
+                }
+            }
+        }
+        public void Show() //вывод
+        {
+            if (this.ifnegative == true) Console.Write("-"); //если число отрицательное, сначала выводиться знак
+            for (int i = length - 1; i >= 0; i--)
+            {
+                Console.Write(number[i]);
+            }
+            Console.WriteLine();
+        }
+        public void Copy() //конструктор копирования
+        {
+            number = this.number;
+            length = this.length;
+            ifnegative = this.ifnegative;
+        }
+        public static LongNumber operator +(LongNumber n1, LongNumber n2) //сложение
+        {
+            if (n1.ifnegative == n2.ifnegative) //если у чисел одинаковый знак, то выполняется сложение, иначе - вычитание
+            {
+                LongNumber output = new LongNumber("");
+                output.length = n1.length > n2.length ? n1.length : n2.length; //выбор большего из двух чисел  
+                for (int i = 0; i < output.length; i++)
+                {
+                    if (n1.number[i] + n2.number[i] > 10) output.number[i + 1]++; //если сумма больше 10, то +1 к следующей цифре результата
+                    output.number[i] += (n1.number[i] + n2.number[i]) % 10;
+                }
+                if (n1.number[n1.length - 1] + n2.number[n2.length - 1] > 10) output.length++; //если сумма цифр больше 10, то длина +1
+                if (n1.ifnegative == true) output.ifnegative = true; //если два чсила отр, то и сумма отр
+                return output;
+            }
+            else
+            {
+                if (n1.ifnegative) //если n1 отр
+                {
+                    n1.ifnegative = false;
+                    LongNumber n3 = n2 - n1;
+                    n1.ifnegative = true;
+                    return n3;
+                }
+                else //если n2 отр
+                {
+                    n2.ifnegative = false;
+                    LongNumber n3 = n1 - n2;
+                    n2.ifnegative = true;
+                    return n3;
+                }
+            }
+
+        }
+        public static LongNumber operator -(LongNumber n1, LongNumber n2) //вычитание
+        {
+            LongNumber output = new LongNumber("");
+            LongNumber n3 = n1; //присвоение новых переменных
+            LongNumber n4 = n2;
+            output.length = n3.length > n4.length ? n3.length : n4.length; //выбор большего числа (по длине)
+            if ((n3.ifnegative == false) && (n4.ifnegative == false)) //если оба положительны
+            {
+                if (n3 > n4 || !(n1 > n2) && !(n1 < n2)) //если из большего вычитают меньшее
+                {
+                    for (int i = 0; i < output.length; i++)
+                    {
+                        if (n3.number[i] < n4.number[i]) //если цифра вычитаемоего меньше цифры уменьшаемого
+                        {
+                            n3.number[i] += 10; //заимствование десятка
+                            n3.number[i + 1] -= 1;
+                        }
+                        output.number[i] = (n3.number[i] - n4.number[i]) % 10;
+                    }
+                }
+                else //если из меньшего вычитается большее
+                {
+                    output = n4 - n3;
+                    output.ifnegative = true; //результат со знаком -
+                }
+                for (int i = output.length - 1; i > 0; i--) //проверка, является ли первая цифра 0, если да, то уменьшается длина результата (output.length-1)
+                {
+                    if (output.number[i] == 0)
+                    {
+                        output.length--;
+                        break;
+                    }
+                    break;
+                }
+                return output;
+            }
+            if ((n3.ifnegative == true) && (n4.ifnegative == true)) //если оба отрицательны, решается как с положительными
+            {
+                n3.ifnegative = !n3.ifnegative;
+                n4.ifnegative = !n4.ifnegative;
+                output = n3 - n4;
+                return output;
+            }
+            else
+            {
+                n4.ifnegative = !n4.ifnegative;
+                output = n3 + n4;
+                n4.ifnegative = !n4.ifnegative;
+                return output;
+            }
+        }
+        public static LongNumber operator *(LongNumber n1, LongNumber n2) //умножение
+        {
+            LongNumber output = new LongNumber("");
+            for (int i = 0; i < output.length; i++)
+                for (int j = 0; j < output.length; j++)
+                {
+                    if (n1.number[i] * n2.number[i] > 10) output.number[i + 1] +=(n1.number[i] * n2.number[i])/10; //если сумма больше 10, то +x к следующей цифре результата
+                    output.number[i + j + 1] += (n1.number[i] * n2.number[j]) % 10;
+                }
+            if (n1.number[n1.length - 1] * n2.number[n2.length - 1] > 10) output.length++;
+            if (n1.ifnegative == n2.ifnegative) //если знаки одинаковые
+                return output;
+            else 
+            {
+                output.ifnegative = true;
+                return output;
+            }
+        }
+        public static LongNumber operator /(LongNumber n1, LongNumber n2) //деление
+        {
+            LongNumber output = new LongNumber("");
+            LongNumber n3 = n1.number / n2.number
+            if (n1.ifnegative == n2.ifnegative) //если знаки одинаковые
+                return output;
+            else
+            {
+                output.ifnegative = true;
+                return output;
+            }
+        }
+        public static bool operator >(LongNumber n1, LongNumber n2) //возвращается true если n1>n2, иначе - false
+        {
+            bool result = true; //предположим, что n1 > n2
+            if (n1.ifnegative == n2.ifnegative) //если знаки одинаковые
+            {
+                if (n1.length == n2.length) //если длины чисел равны
+                {
+                    for (int i = n1.length - 1; i > 0; i--) //если i-ая цифра n1 < i-ой цифры n2 то вернет false
+                    {
+                        if (n1.number[i] < n2.number[i])
+                        {
+                            result = false;
+                            break;
+                        }
+                    }
+                }
+                if (n1.length > n2.length) result = true; //если разная длина
+                else result = false;
+                if (n1.ifnegative == true) result = !result; //если знаки отрицательные, знак неравества поворачивается
+            }
+            if (n1.ifnegative == false) result = true; //если разные знаки
+            else result = false;
+            return result;
+        }
+        public static bool operator <(LongNumber n1, LongNumber n2) //возвращается true если n1<n2, иначе - false
+        {
+            if (n1 > n2 || n1 == n2) return false;
+            else return true;
+
+        }
+        public static bool operator ==(LongNumber b1, LongNumber b2) //равенство
+        {
+            bool result = false; //предположим, числа неравны
+            if (b1.length == b2.length) //если длина одинковая
+            {
+                result = true;
+                for (int i = b1.length; i > 0; i--)
+                {
+                    if (b1.number[i] != b2.number[i]) //если цифры не совпадают присвоить false
+                    {
+                        result = false;
+                        break;
+                    }
+                }
+            }
+            return result;
+        }
+        public static bool operator !=(LongNumber b1, LongNumber b2) //неравенство
+        {
+            if (b1 == b2) return false;
+            else return true;
+        }
+    }
+}
