@@ -1,0 +1,59 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+
+namespace Files
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            //пути к файлам
+            string inputPath = @"C:\Users\gubar\Documents\уник\input.txt"; 
+            string outputPath = @"C:\Users\gubar\Documents\уник\output.txt"; 
+
+            Console.Write("Введите два числа, которыt необходимо сохранить в файл input.txt\n" + "Введите первое число: ");
+            int n1 = int.Parse(Console.ReadLine()); //int.parse проверяет является ли введённое значение числом
+            Console.Write("Введите второе число: ");
+            int n2 = int.Parse(Console.ReadLine());
+
+            //streamwriter и streamreader классы, используемые для работы с файлами
+            //streamwriter записывает символы
+            //streamreader открывает, читает и закрывает файлы
+            using (StreamWriter sw = new StreamWriter(inputPath, false, System.Text.Encoding.Default)) //путь, параметр обнаружения(?), кодировка
+            {
+                sw.Write(n1); //записывает в файл данные
+                sw.Write("\n" + n2);
+            }
+
+            using (StreamReader sr = new StreamReader(inputPath, System.Text.Encoding.Default))
+            {
+                string line;
+                int count = 0;
+                while ((line = sr.ReadLine()) != null) //считывает строки, пока не будет пустая
+                {
+                    if (count == 0)
+                    {
+                        n1 = int.Parse(line); //преобразует строку line в число n1
+                    }
+                    else
+                    {
+                        n2 = int.Parse(line); //преобразует строку line в число n2
+                    }
+                    ++count;
+                }
+            }
+
+            int result = n1 + n2;
+            Console.WriteLine("Cумма: " + result);
+            //записывает рузельтат в output
+            using (StreamWriter sw = new StreamWriter(outputPath, false, System.Text.Encoding.Default))
+            {
+                sw.Write(result);
+            }
+        }
+    }
+}
