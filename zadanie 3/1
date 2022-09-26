@@ -1,0 +1,45 @@
+using System;
+
+namespace Const_and_readonly
+{
+    //Разница между const и readonly
+    class Program
+    {
+        //Константа
+        //определяется параметром const
+        //const не может быть изменено
+        //может быть объявлено только внутри метода
+        //значение может быть (и должно быть) присвоено только при объявлении константы
+        //не может быть использовано в качестве статического модификатора
+        public const int C = 10; //нельхя написать просто public const int C
+        public const string str = "Строка";
+
+        //readonly переменные
+        //может быть изменино (в конструкторе)
+        //не может быть объявлено внутри метода (только перед ним)	
+        //в readonly полях можно присваивать значения и при объявлении, и в конструкторе
+        //может быть использовано в качестве статического модификатора
+        public readonly int n1;
+        public readonly int n2;
+        public Program(int b, int c)
+        {
+
+            n1 = b;
+            n2 = c;
+            Console.WriteLine("n1 = {0} " + "и n2 = {1}", n1, n2);
+        }
+        //присоваение значений readonly переменных
+        //с помощью конструктора
+        //(константы так не могут!!)
+
+
+        static void Main(string[] args)
+        {
+            //вывод констант
+            Console.WriteLine("const C = {0}", C);
+            Console.WriteLine("string str = {0}", str);
+            //вывод readonly полей
+            Program obj1 = new Program(100, 200);
+        }
+    }
+}
